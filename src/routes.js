@@ -1,8 +1,10 @@
+const { userController } = require('./controllers/user')
+
 exports.routes = [
   {
     method: 'GET',
     endpoint: '/users',
-    runController: null,
+    runController: userController.getUsers,
   },
   {
     method: 'GET',

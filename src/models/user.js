@@ -11,8 +11,7 @@ exports.User = class {
     fs.readFile(
       path.join(__dirname, '..', 'data', 'users.json'), 
       (err, fileContent) => {
-        const usersParsedFromJson = JSON.parse(fileContent)
-        callback(usersParsedFromJson)
+        callback(fileContent)
       }
     )
   }
