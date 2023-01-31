@@ -23,7 +23,7 @@ exports.routes = [
   },
   {
     method: 'DELETE',
-    endpoint: '/users',
-    runController: null,
+    endpoint: '/users/:id',
+    runController: userController.deleteUser,
   },
 ]

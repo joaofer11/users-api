@@ -25,5 +25,13 @@ exports.userController = {
         res.end(JSON.stringify(createdUser))
       })
     })
+  },
+  deleteUser(req, res) {
+    const { id } = req.pathParams
+    
+    User.removeUser(Number(id))
+    
+    res.writeHead(202, {})
+    res.end()
   }
 }
