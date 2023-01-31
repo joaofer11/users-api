@@ -12,24 +12,25 @@ const setParams = ({ req, reqEndpointAsArr, serverEndpointAsArr }) => {
           }
        :  acc
     ), {})
-  
+
   req.pathParams = filteredPathParams
 }
 
 exports.getMatchedRoute = (req) => {
-  const { method, url: reqEndpoint } = req
-  
+  const { method: reqMethod, url: reqEndpoint } = req
+
   let serverEndpointAsArr = null;
   const reqEndpointAsArr = splitEndpointInArr(reqEndpoint)
-  
+
   const matchedRoute = routes.find(route => {
     const isAnValidEndpointName = route.endpoint.includes(reqEndpointAsArr[0])
     serverEndpointAsArr = splitEndpointInArr(route.endpoint)
     const hasTheSameEndpointLength = reqEndpointAsArr.length === serverEndpointAsArr.length
-    
-    return isAnValidEndpointName && hasTheSameEndpointLength
+    const hasTheSameMethod = reqMethod === route.method
+
+    return isAnValidEndpointName && hasTheSameEndpointLength && hasTheSameMethod
   })
-  
+
   if (matchedRoute && reqEndpointAsArr.length > 1) {
     setParams({
       req,
@@ -37,8 +38,8 @@ exports.getMatchedRoute = (req) => {
       serverEndpointAsArr,
     })
   }
-  
-  return matchedRoute 
+
+  return matchedRoute
     ? {
       matchedRoute,
       isRouteExists: true,
