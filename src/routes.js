@@ -9,7 +9,7 @@ exports.routes = [
   {
     method: 'GET',
     endpoint: '/users/:id',
-    runController: null,
+    runController: userController.getUserById,
   },
   {
     method: 'POST',
