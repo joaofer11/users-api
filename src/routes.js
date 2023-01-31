@@ -14,7 +14,7 @@ exports.routes = [
   {
     method: 'POST',
     endpoint: '/users',
-    runController: null,
+    runController: userController.postUser,
   },
   {
     method: 'PUT',

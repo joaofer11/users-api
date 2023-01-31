@@ -7,6 +7,35 @@ exports.User = class {
     this.name = name
   }
 
+  saveNewUser(callback) {
+    fs.readFile(
+      path.join(__dirname, '..', 'data', 'users.json'),
+      (err, fileContent) => {
+        if (!err) {
+          const parsedUsers = JSON.parse(fileContent)
+          this.id = parsedUsers[parsedUsers.length - 1].id + 1
+          parsedUsers.push(this)
+          
+          fs.writeFile(
+            path.join(__dirname, '..', 'data', 'users.json'), 
+            JSON.stringify(parsedUsers), 
+            err => callback(this)
+          )
+          return
+        }
+        
+        this.id = 1
+        const firstInstanceOfData = JSON.stringify([this])
+        
+        fs.writeFile(
+          path.join(__dirname, '..', 'data', 'users.json'), 
+          firstInstanceOfData, 
+          err => callback(this)
+        )
+      }
+    )
+  }
+
   static fetchAllUsers(callback) {
     fs.readFile(
       path.join(__dirname, '..', 'data', 'users.json'),
