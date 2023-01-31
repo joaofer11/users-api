@@ -1,13 +1,13 @@
 const http = require('http')
 
 const { routes } = require('./routes')
-const { getCurrentRoute } = require('./helpers/getCurrentRoute')
+const { getMatchedRoute } = require('./helpers/get-matched-route')
 
 const server = http.createServer((req, res) => {
-  const { isRouteExists, route } = getCurrentRoute(req.method, req.url)
+  const { isRouteExists, matchedRoute } = getMatchedRoute(req)
   
   if (isRouteExists) {
-    route.runController(req, res)
+    matchedRoute.runController(req, res)
   }
 })
 
