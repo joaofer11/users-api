@@ -6,24 +6,19 @@ exports.userController = {
   },
   getUserById(req, res) {
     const { id } = req.pathParams || {}
-
+    
     User.fetchUserById(Number(id), userResource => {
       res.writeHead(200, { 'Content-Type': 'application/json' })
       res.end(userResource)
     })
   },
   postUser(req, res) {
-    let body = '';
-
-    req.on('data', chunk => body += chunk)
+    const { name } = req.body
+    const user = new User(name)
     
-    req.on('end', () => {
-      const { name } = JSON.parse(body)
-      const user = new User(name)
-      user.saveNewUser(createdUser => {
-        res.writeHead(201, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify(createdUser))
-      })
+    user.saveNewUser(createdUser => {
+      res.writeHead(201, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify(createdUser))
     })
   },
   deleteUser(req, res) {

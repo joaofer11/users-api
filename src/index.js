@@ -1,12 +1,17 @@
 const http = require('http')
 
 const { routes } = require('./routes')
+const { parseBody } = require('./helpers/parse-body')
 const { getMatchedRoute } = require('./helpers/get-matched-route')
 
 const server = http.createServer((req, res) => {
   const { isRouteExists, matchedRoute } = getMatchedRoute(req)
   
   if (isRouteExists) {
+    if (['POST', 'PUT'].includes(req.method)) {
+      parseBody(req, () => matchedRoute.runController(req, res))
+      return
+    }
     matchedRoute.runController(req, res)
   }
 })
