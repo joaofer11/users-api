@@ -57,4 +57,22 @@ exports.User = class {
         callback(JSON.stringify({ err: 'User not found' }))
     })
   }
+  
+  static removeUser(id) {
+    fs.readFile(
+      path.join(__dirname, '..', 'data', 'users.json'),
+      (err, fileContent) => {
+        if (!err) {
+          const parsedUsers = JSON.parse(fileContent)
+          const updatedUsers = parsedUsers.filter(user => user.id !== id)
+          
+          fs.writeFile(
+            path.join(__dirname, '..', 'data', 'users.json'),
+            JSON.stringify(updatedUsers),
+            err => err
+          )
+        }
+      }
+    )
+  }
 }
