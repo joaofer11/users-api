@@ -66,6 +66,14 @@ exports.User = class {
           const parsedUsers = JSON.parse(fileContent)
           const updatedUsers = parsedUsers.filter(user => user.id !== id)
           
+          if (updatedUsers.length < 1) {
+            fs.unlink(
+              path.join(__dirname, '..', 'data', 'users.json'),
+              err => err
+            )
+            return
+          }
+          
           fs.writeFile(
             path.join(__dirname, '..', 'data', 'users.json'),
             JSON.stringify(updatedUsers),
