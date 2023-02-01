@@ -1,5 +1,4 @@
-const fs = require('fs')
-const path = require('path')
+const { readDbFile } = require('../helpers/read-db-file.js')
 
 exports.User = class {
   constructor(name) {
@@ -8,101 +7,60 @@ exports.User = class {
   }
 
   saveNewUser(callback) {
-    fs.readFile(
-      path.join(__dirname, '..', 'data', 'users.json'),
-      (err, fileContent) => {
-        if (!err) {
-          const parsedUsers = JSON.parse(fileContent)
-          this.id = parsedUsers[parsedUsers.length - 1].id + 1
-          parsedUsers.push(this)
-          
-          fs.writeFile(
-            path.join(__dirname, '..', 'data', 'users.json'), 
-            JSON.stringify(parsedUsers), 
-            err => callback(this)
-          )
-          return
-        }
-        
-        this.id = 1
-        const firstInstanceOfData = JSON.stringify([this])
-        
-        fs.writeFile(
-          path.join(__dirname, '..', 'data', 'users.json'), 
-          firstInstanceOfData, 
-          err => callback(this)
-        )
-      }
-    )
+    const { writeDbFile } = readDbFile(usersData => {
+      this.id = usersData[usersData.length - 1].id + 1
+      usersData.push(this)
+      
+      writeDbFile(usersData, () => callback(JSON.stringify(this)))
+    }, true, () => {
+      this.id = 1
+      writeDbFile([this], (firstInstanceOfUsersData) => 
+        callback(firstInstanceOfUsersData)
+      )
+    })
   }
 
   static fetchAllUsers(callback) {
-    fs.readFile(
-      path.join(__dirname, '..', 'data', 'users.json'),
-      (err, fileContent) => {
-        callback(fileContent)
-      }
-    )
+    readDbFile(usersAsJson => callback(usersAsJson))
   }
 
   static fetchUserById(id, callback) {
-    fs.readFile(
-      path.join(__dirname, '..', 'data', 'users.json'),
-      (err, fileContent) => {
-        const parsedUsers = JSON.parse(fileContent)
-        const existingUser = parsedUsers.find(user => user.id === id)
-
-        if (existingUser) return callback(JSON.stringify(existingUser))
-
-        callback(JSON.stringify({ err: 'User not found' }))
-    })
+    readDbFile((parsedUsers) => {
+      const existingUser = parsedUsers.find(user => user.id === id)
+      
+      if (existingUser) return callback(JSON.stringify(existingUser))
+    }, true)
   }
   
-  static updateUser({ id, name }, callback) {
-    fs.readFile(
-      path.join(__dirname, '..', 'data', 'users.json'),
-      (err, fileContent) => {
-        if (!err) {
-          const parsedUsers = JSON.parse(fileContent)
-          const updatedUsers = parsedUsers.map(user => (
-            user.id === id ? {
-              ...user,
-              name,
-            } : user
-          ))
-          fs.writeFile(
-            path.join(__dirname, '..', 'data', 'users.json'),
-            JSON.stringify(updatedUsers),
-            err => callback()
-          )
-        }
-      }
-    )
+  static updateUser(data, callback) {
+    const { id, name } = data
+    
+    const { writeDbFile } = readDbFile(parsedUsers => {
+      const usersDataWithThisOneUpdated = parsedUsers.map(user => (
+        user.id === id
+          ? {
+            ...user,
+            name
+          } : user
+      ))
+      
+      writeDbFile(usersDataWithThisOneUpdated, () => null)
+    }, true)
   }
   
   static removeUser(id) {
-    fs.readFile(
-      path.join(__dirname, '..', 'data', 'users.json'),
-      (err, fileContent) => {
-        if (!err) {
-          const parsedUsers = JSON.parse(fileContent)
-          const updatedUsers = parsedUsers.filter(user => user.id !== id)
-          
-          if (updatedUsers.length < 1) {
-            fs.unlink(
-              path.join(__dirname, '..', 'data', 'users.json'),
-              err => err
-            )
-            return
-          }
-          
-          fs.writeFile(
-            path.join(__dirname, '..', 'data', 'users.json'),
-            JSON.stringify(updatedUsers),
-            err => err
-          )
-        }
+    const { writeDbFile, removeDbFile } = readDbFile((parsedUsers) => {
+      const usersDataWithThisOneDeleted = parsedUsers.filter(user => (
+        user.id !== id
+      ))
+      const hasNoMoreUserRecordInDbFile = usersDataWithThisOneDeleted.length < 1
+      
+      if (hasNoMoreUserRecordInDbFile) {
+        removeDbFile()
+        return
       }
-    )
+      
+      writeDbFile(usersDataWithThisOneDeleted, () => null)
+    }, true)
   }
 }

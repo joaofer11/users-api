@@ -13,15 +13,15 @@ exports.userController = {
     const user = new User(name)
     
     user.saveNewUser(createdUserResource => {
-      res.send(201, JSON.stringify(createdUserResource))
+      res.send(201, createdUserResource)
     })
   },
   putUser(req, res) {
     const userToUpdate = { id: Number(req.pathParams.id), name: req.body.name }
     
-    User.updateUser(userToUpdate, () => {
-      res.send(200, JSON.stringify(userToUpdate))
-    })
+    User.updateUser(userToUpdate)
+    
+    res.send(200, JSON.stringify(userToUpdate))
   },
   deleteUser(req, res) {
     const { id } = req.pathParams
