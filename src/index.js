@@ -14,6 +14,9 @@ const server = http.createServer((req, res) => {
     }
     matchedRoute.runController(req, res)
   }
+  
+  res.writeHead(404, { 'Content-Type': 'text/html' })
+  res.end(`Cannot ${req.method} at ${req.url}`)
 })
 
 server.listen(3000, () => console.log('Server has been started at http://localhost:3000'))
