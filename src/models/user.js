@@ -58,6 +58,28 @@ exports.User = class {
     })
   }
   
+  static updateUser({ id, name }, callback) {
+    fs.readFile(
+      path.join(__dirname, '..', 'data', 'users.json'),
+      (err, fileContent) => {
+        if (!err) {
+          const parsedUsers = JSON.parse(fileContent)
+          const updatedUsers = parsedUsers.map(user => (
+            user.id === id ? {
+              ...user,
+              name,
+            } : user
+          ))
+          fs.writeFile(
+            path.join(__dirname, '..', 'data', 'users.json'),
+            JSON.stringify(updatedUsers),
+            err => callback()
+          )
+        }
+      }
+    )
+  }
+  
   static removeUser(id) {
     fs.readFile(
       path.join(__dirname, '..', 'data', 'users.json'),
