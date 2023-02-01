@@ -21,6 +21,15 @@ exports.userController = {
       res.end(JSON.stringify(createdUser))
     })
   },
+  putUser(req, res) {
+    const { name } = req.body
+    const { id } = req.pathParams
+    
+    User.updateUser({ id: Number(id), name }, () => {
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ id, name }))
+    })
+  },
   deleteUser(req, res) {
     const { id } = req.pathParams
     

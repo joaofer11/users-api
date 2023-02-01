@@ -18,8 +18,8 @@ exports.routes = [
   },
   {
     method: 'PUT',
-    endpoint: '/users',
-    runController: null,
+    endpoint: '/users/:id',
+    runController: userController.putUser,
   },
   {
     method: 'DELETE',
